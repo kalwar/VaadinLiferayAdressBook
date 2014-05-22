@@ -16,7 +16,6 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
-import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
@@ -24,9 +23,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
@@ -43,8 +40,6 @@ public class AddressBookUI extends UI {
 
     private Table contactList = new Table();
     private TextField searchField = new TextField();
-    private Button addNewContactButton = new Button("New");
-    private Button removeContactButton = new Button("Remove this contact");
     private FormLayout editorLayout = new FormLayout();
     private BeanFieldGroup<User> editorFields = new BeanFieldGroup<User>(
             User.class);
@@ -62,7 +57,6 @@ public class AddressBookUI extends UI {
         initContactList();
         initEditor();
         initSearch();
-        initAddRemoveButtons();
         initSaveButton();
     }
 
@@ -117,7 +111,6 @@ public class AddressBookUI extends UI {
 
             editorFields.bind(field, fieldName);
         }
-//		 editorLayout.addComponent(removeContactButton);
 
         editorFields.setBuffered(false);
     }
@@ -156,29 +149,6 @@ public class AddressBookUI extends UI {
         public boolean appliesToProperty(Object id) {
             return true;
         }
-    }
-
-    private void initAddRemoveButtons() {
-        addNewContactButton.addClickListener(new ClickListener() {
-            public void buttonClick(ClickEvent event) {
-                contactContainer.removeAllContainerFilters();
-                Object contactId = contactContainer.addItemAt(0);
-
-                contactList.getContainerProperty(contactId, FNAME).setValue(
-                        "New");
-                contactList.getContainerProperty(contactId, LNAME).setValue(
-                        "Contact");
-
-                contactList.select(contactId);
-            }
-        });
-
-        removeContactButton.addClickListener(new ClickListener() {
-            public void buttonClick(ClickEvent event) {
-                Object contactId = contactList.getValue();
-                contactList.removeItem(contactId);
-            }
-        });
     }
 
     private void initContactList() {
