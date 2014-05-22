@@ -89,7 +89,7 @@ public class AddressBookUI extends UI {
 		setContent(splitPanel);
 
 		splitPanel.setWidth("100%");
-		splitPanel.setHeight("750px");
+		splitPanel.setHeight("450px");
 
 		VerticalLayout leftLayout = new VerticalLayout();
 		splitPanel.addComponent(leftLayout);
