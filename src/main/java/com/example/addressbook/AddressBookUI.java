@@ -3,6 +3,7 @@ package com.example.addressbook;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -208,8 +209,8 @@ public class AddressBookUI extends UI {
 	private static BeanItemContainer<User> createDummyDatasource() {
 		List<User> users;
 		try {
-			users = UserLocalServiceUtil.getUsers(0,
-					UserLocalServiceUtil.getUsersCount());
+			users = UserLocalServiceUtil.getUsers(QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS);
 			BeanItemContainer<User> userContainer = new BeanItemContainer<User>(
 					User.class, users);
 
