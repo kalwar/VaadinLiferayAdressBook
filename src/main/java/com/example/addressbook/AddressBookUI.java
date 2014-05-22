@@ -33,7 +33,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-@Theme("addressbook")
+//@Theme("addressbook")
+@Theme("dawn")
 @SuppressWarnings("serial")
 @Widgetset("com.example.addressbook.AppWidgetSet")
 public class AddressBookUI extends UI {
