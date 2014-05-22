@@ -39,187 +39,184 @@ import com.vaadin.ui.VerticalLayout;
 @Widgetset("com.example.addressbook.AppWidgetSet")
 public class AddressBookUI extends UI {
 
-	private static Log log = LogFactoryUtil.getLog(AddressBookUI.class);
+    private static Log log = LogFactoryUtil.getLog(AddressBookUI.class);
 
-	private Table contactList = new Table();
-	private TextField searchField = new TextField();
-	private Button addNewContactButton = new Button("New");
-	private Button removeContactButton = new Button("Remove this contact");
-	private FormLayout editorLayout = new FormLayout();
-	private BeanFieldGroup<User> editorFields = new BeanFieldGroup<User>(User.class);
+    private Table contactList = new Table();
+    private TextField searchField = new TextField();
+    private Button addNewContactButton = new Button("New");
+    private Button removeContactButton = new Button("Remove this contact");
+    private FormLayout editorLayout = new FormLayout();
+    private BeanFieldGroup<User> editorFields = new BeanFieldGroup<User>(
+            User.class);
 
-	private static final String FNAME = "firstName";
-	private static final String LNAME = "lastName";
-	private static final String COMPANY = "companyMx";
-	private static final String[] fieldNames = new String[] { FNAME, LNAME,
-			COMPANY };
+    private static final String FNAME = "firstName";
+    private static final String LNAME = "lastName";
+    private static final String COMPANY = "companyMx";
+    private static final String[] fieldNames = new String[]{FNAME, LNAME,
+        COMPANY};
 
-	BeanItemContainer<User> contactContainer = createDummyDatasource();
+    BeanItemContainer<User> contactContainer = createDummyDatasource();
 
-	protected void init(VaadinRequest request) {
-		initLayout();
-		initContactList();
-		initEditor();
-		initSearch();
-		initAddRemoveButtons();
-		initSaveButton();
-	}
+    protected void init(VaadinRequest request) {
+        initLayout();
+        initContactList();
+        initEditor();
+        initSearch();
+        initAddRemoveButtons();
+        initSaveButton();
+    }
 
-	private void initSaveButton() {
-		Button saveButton = new Button("Save");
-		saveButton.addClickListener(new Button.ClickListener() {
-			
-			@Override
-			public void buttonClick(ClickEvent event) {
-				try {
-					UserLocalServiceUtil.updateUser(editorFields.getItemDataSource().getBean());
-				} catch (SystemException e) {
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				}
-			}
-		});
-		
-		editorLayout.addComponent(saveButton);
-	}
+    private void initSaveButton() {
+        Button saveButton = new Button("Save");
+        saveButton.addClickListener(new Button.ClickListener() {
 
-	private void initLayout() {
+            @Override
+            public void buttonClick(ClickEvent event) {
+                try {
+                    UserLocalServiceUtil.updateUser(editorFields.
+                            getItemDataSource().getBean());
+                } catch (SystemException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
-		HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
-		setContent(splitPanel);
+        editorLayout.addComponent(saveButton);
+    }
 
-		splitPanel.setWidth("100%");
-		splitPanel.setHeight("450px");
+    private void initLayout() {
 
-		VerticalLayout leftLayout = new VerticalLayout();
-		splitPanel.addComponent(leftLayout);
-		splitPanel.addComponent(editorLayout);
-		leftLayout.addComponent(contactList);
-		HorizontalLayout bottomLeftLayout = new HorizontalLayout();
-		leftLayout.addComponent(bottomLeftLayout);
-		bottomLeftLayout.addComponent(searchField);
-		// bottomLeftLayout.addComponent(addNewContactButton);
 
-		leftLayout.setSizeFull();
+        contactList.setSizeFull();
 
-		leftLayout.setExpandRatio(contactList, 1);
-		contactList.setSizeFull();
+        searchField.setWidth("100%");
 
-		bottomLeftLayout.setWidth("100%");
-		searchField.setWidth("100%");
-		bottomLeftLayout.setExpandRatio(searchField, 1);
+        editorLayout.setMargin(true);
+        editorLayout.setVisible(false);
 
-		editorLayout.setMargin(true);
-		editorLayout.setVisible(false);
-	}
+        VerticalLayout leftLayout = new VerticalLayout();
+        leftLayout.addComponents(contactList, searchField);
+        leftLayout.setSizeFull();
+        leftLayout.setExpandRatio(contactList, 1);
 
-	private void initEditor() {
+        HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
+        splitPanel.setWidth("100%");
+        splitPanel.setHeight("450px");
+        splitPanel.addComponent(leftLayout);
+        splitPanel.addComponent(editorLayout);
+        setContent(splitPanel);
+    }
 
-		for (String fieldName : fieldNames) {
-			TextField field = new TextField(fieldName);
-			editorLayout.addComponent(field);
-			field.setWidth("100%");
+    private void initEditor() {
 
-			editorFields.bind(field, fieldName);
-		}
+        for (String fieldName : fieldNames) {
+            TextField field = new TextField(fieldName);
+            editorLayout.addComponent(field);
+            field.setWidth("100%");
+
+            editorFields.bind(field, fieldName);
+        }
 //		 editorLayout.addComponent(removeContactButton);
 
-		editorFields.setBuffered(false);
-	}
+        editorFields.setBuffered(false);
+    }
 
-	private void initSearch() {
+    private void initSearch() {
 
-		searchField.setInputPrompt("Search contacts");
+        searchField.setInputPrompt("Search contacts");
 
-		searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
+        searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
 
-		searchField.addTextChangeListener(new TextChangeListener() {
-			public void textChange(final TextChangeEvent event) {
+        searchField.addTextChangeListener(new TextChangeListener() {
+            public void textChange(final TextChangeEvent event) {
 
-				contactContainer.removeAllContainerFilters();
-				contactContainer.addContainerFilter(new ContactFilter(event
-						.getText()));
-			}
-		});
-	}
+                contactContainer.removeAllContainerFilters();
+                contactContainer.addContainerFilter(new ContactFilter(event
+                        .getText()));
+            }
+        });
+    }
 
-	private static class ContactFilter implements Filter {
-		private String needle;
+    private static class ContactFilter implements Filter {
 
-		public ContactFilter(String needle) {
-			this.needle = needle.toLowerCase();
-		}
+        private String needle;
 
-		public boolean passesFilter(Object itemId, Item item) {
-			String haystack = ("" + item.getItemProperty(FNAME).getValue()
-					+ item.getItemProperty(LNAME).getValue() + item
-					.getItemProperty(COMPANY).getValue()).toLowerCase();
-			return haystack.contains(needle);
-		}
+        public ContactFilter(String needle) {
+            this.needle = needle.toLowerCase();
+        }
 
-		public boolean appliesToProperty(Object id) {
-			return true;
-		}
-	}
+        public boolean passesFilter(Object itemId, Item item) {
+            String haystack = ("" + item.getItemProperty(FNAME).getValue()
+                    + item.getItemProperty(LNAME).getValue() + item
+                    .getItemProperty(COMPANY).getValue()).toLowerCase();
+            return haystack.contains(needle);
+        }
 
-	private void initAddRemoveButtons() {
-		addNewContactButton.addClickListener(new ClickListener() {
-			public void buttonClick(ClickEvent event) {
-				contactContainer.removeAllContainerFilters();
-				Object contactId = contactContainer.addItemAt(0);
+        public boolean appliesToProperty(Object id) {
+            return true;
+        }
+    }
 
-				contactList.getContainerProperty(contactId, FNAME).setValue(
-						"New");
-				contactList.getContainerProperty(contactId, LNAME).setValue(
-						"Contact");
+    private void initAddRemoveButtons() {
+        addNewContactButton.addClickListener(new ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                contactContainer.removeAllContainerFilters();
+                Object contactId = contactContainer.addItemAt(0);
 
-				contactList.select(contactId);
-			}
-		});
+                contactList.getContainerProperty(contactId, FNAME).setValue(
+                        "New");
+                contactList.getContainerProperty(contactId, LNAME).setValue(
+                        "Contact");
 
-		removeContactButton.addClickListener(new ClickListener() {
-			public void buttonClick(ClickEvent event) {
-				Object contactId = contactList.getValue();
-				contactList.removeItem(contactId);
-			}
-		});
-	}
+                contactList.select(contactId);
+            }
+        });
 
-	private void initContactList() {
-		List<String> ids = new ArrayList<String>();
-		ids.add(FNAME);
-		ids.add(LNAME);
-		ids.add(COMPANY);
-		contactList.setContainerDataSource(contactContainer, ids);
-		contactList.setColumnHeaders("First name", "Last name", "Company");
-		contactList.setSelectable(true);
-		contactList.setImmediate(true);
+        removeContactButton.addClickListener(new ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                Object contactId = contactList.getValue();
+                contactList.removeItem(contactId);
+            }
+        });
+    }
 
-		contactList.addValueChangeListener(new Property.ValueChangeListener() {
-			public void valueChange(ValueChangeEvent event) {
-				Object contactId = contactList.getValue();
-				if (contactId != null)
-					editorFields.setItemDataSource(contactList
-							.getItem(contactId));
+    private void initContactList() {
+        List<String> ids = new ArrayList<String>();
+        ids.add(FNAME);
+        ids.add(LNAME);
+        ids.add(COMPANY);
+        contactList.setContainerDataSource(contactContainer, ids);
+        contactList.setColumnHeaders("First name", "Last name", "Company");
+        contactList.setSelectable(true);
+        contactList.setImmediate(true);
 
-				editorLayout.setVisible(contactId != null);
-			}
-		});
-	}
+        contactList.addValueChangeListener(new Property.ValueChangeListener() {
+            public void valueChange(ValueChangeEvent event) {
+                Object contactId = contactList.getValue();
+                if (contactId != null) {
+                    editorFields.setItemDataSource(contactList
+                            .getItem(contactId));
+                }
 
-	private static BeanItemContainer<User> createDummyDatasource() {
-		List<User> users;
-		try {
-			users = UserLocalServiceUtil.getUsers(QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS);
-			BeanItemContainer<User> userContainer = new BeanItemContainer<User>(
-					User.class, users);
+                editorLayout.setVisible(contactId != null);
+            }
+        });
+    }
 
-			return userContainer;
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-	}
+    private static BeanItemContainer<User> createDummyDatasource() {
+        List<User> users;
+        try {
+            users = UserLocalServiceUtil.getUsers(QueryUtil.ALL_POS,
+                    QueryUtil.ALL_POS);
+            BeanItemContainer<User> userContainer = new BeanItemContainer<User>(
+                    User.class, users);
+
+            return userContainer;
+        } catch (SystemException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
 }
